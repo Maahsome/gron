@@ -446,16 +446,16 @@ func (ss *statements) fillData(prefix statement, v interface{}) {
 		// It's an object
 		for k, sub := range vv {
 			if validIdentifier(k) {
-				ss.fill(prefix.withBare(k), sub)
+				ss.fillData(prefix.withBare(k), sub)
 			} else {
-				ss.fill(prefix.withQuotedKey(k), sub)
+				ss.fillData(prefix.withQuotedKey(k), sub)
 			}
 		}
 
 	case []interface{}:
 		// It's an array
 		for k, sub := range vv {
-			ss.fill(prefix.withNumericKey(k), sub)
+			ss.fillData(prefix.withNumericKey(k), sub)
 		}
 	default:
 		ss.addWithValue(prefix, valueTokenFromInterface(v))
