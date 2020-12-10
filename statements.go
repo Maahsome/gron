@@ -385,7 +385,7 @@ func (ss statements) Contains(search statement) bool {
 
 // statementsFromJSON takes an io.Reader containing JSON
 // and returns statements or an error on failure
-func statementsFromJSON(r io.Reader, prefix statement) (statements, error) {
+func statementsFromJSON(r io.Reader, prefix statement, opts int) (statements, error) {
 	var top interface{}
 	d := json.NewDecoder(r)
 	d.UseNumber()
@@ -394,7 +394,12 @@ func statementsFromJSON(r io.Reader, prefix statement) (statements, error) {
 		return nil, err
 	}
 	ss := make(statements, 0, 32)
-	ss.fill(prefix, top)
+	if opts&optOnlyData > 0 {
+		ss.fillData(prefix, top)
+	} else {
+		ss.fill(prefix, top)
+	}
+
 	return ss, nil
 }
 
@@ -423,6 +428,37 @@ func (ss *statements) fill(prefix statement, v interface{}) {
 		for k, sub := range vv {
 			ss.fill(prefix.withNumericKey(k), sub)
 		}
+	}
+
+}
+
+// fill takes a prefix statement and some value and recursively fills
+// the statement list using that value
+func (ss *statements) fillData(prefix statement, v interface{}) {
+
+	// Add a statement for the current prefix and value
+	// ss.addWithValue(prefix, valueTokenFromInterface(v))
+
+	// Recurse into objects and arrays
+	switch vv := v.(type) {
+
+	case map[string]interface{}:
+		// It's an object
+		for k, sub := range vv {
+			if validIdentifier(k) {
+				ss.fill(prefix.withBare(k), sub)
+			} else {
+				ss.fill(prefix.withQuotedKey(k), sub)
+			}
+		}
+
+	case []interface{}:
+		// It's an array
+		for k, sub := range vv {
+			ss.fill(prefix.withNumericKey(k), sub)
+		}
+	default:
+		ss.addWithValue(prefix, valueTokenFromInterface(v))
 	}
 
 }

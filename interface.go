@@ -22,6 +22,7 @@ const (
 	optMonochrome = 1 << iota
 	optNoSort
 	optJSON
+	optOnlyData
 )
 
 // Gron Interface Parameters
@@ -31,6 +32,7 @@ type Gron struct {
 	noSort       bool
 	monochrome   bool
 	asJSONStream bool
+	onlyData     bool
 }
 
 // NewGron - Create a new processor
@@ -41,6 +43,7 @@ func NewGron(reader io.Reader, writer io.Writer) *Gron {
 		noSort:       false,
 		monochrome:   false,
 		asJSONStream: false,
+		onlyData:     false,
 	}
 	return g
 }
@@ -65,6 +68,11 @@ func (g *Gron) SetJSONStream(json bool) {
 	g.asJSONStream = json
 }
 
+// SetOnlyData - Set output to be wrapped as JSON
+func (g *Gron) SetOnlyData(onlydata bool) {
+	g.onlyData = onlydata
+}
+
 func calculateOptions(g *Gron) int {
 	var opts int
 	if g.monochrome {
@@ -75,6 +83,9 @@ func calculateOptions(g *Gron) int {
 	}
 	if g.asJSONStream {
 		opts = opts | optJSON
+	}
+	if g.onlyData {
+		opts = opts | optOnlyData
 	}
 	return opts
 }

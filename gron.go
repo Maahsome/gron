@@ -23,7 +23,7 @@ func gron(r io.Reader, w io.Writer, opts int) (int, error) {
 		conv = statementToColorString
 	}
 
-	ss, err := statementsFromJSON(r, statement{{"json", typBare}})
+	ss, err := statementsFromJSON(r, statement{{"json", typBare}}, opts)
 	if err != nil {
 		goto out
 	}
@@ -107,7 +107,7 @@ func gronStream(r io.Reader, w io.Writer, opts int) (int, error) {
 		line := bytes.NewBuffer(sc.Bytes())
 
 		var ss statements
-		ss, err = statementsFromJSON(line, makePrefix(i))
+		ss, err = statementsFromJSON(line, makePrefix(i), opts)
 		i++
 		if err != nil {
 			goto out
