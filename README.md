@@ -19,6 +19,11 @@ io.Writer that outputs to anything other than a byte buffer to capture the data
 to a variable.  Though we can simply pass an io.Writer that writes to stdout
 similar to the way the cli tool does with `colorable.NewColorableStdout()`.
 
+## Feature Divergance
+
+I have added a `.OnlyData(true)` property to display the GRON notation without
+any of the empty object/array lines.
+
 ### Pull down the module
 
 `go get github.com/maahsome/gron`
